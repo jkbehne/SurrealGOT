@@ -23,7 +23,7 @@ def main(path_list: list[str], base_list: list[str], out_dir: str) -> None:
         base_list: List of name abbreviations for each path
         out_dir: The directory to output the png files to
     """
-    if len(path_str) != len(base_list):
+    if len(path_list) != len(base_list):
         raise ValueError("path_list and base_list must be the same length")
     out_path = Path(out_dir)
     if not out_path.exists():
