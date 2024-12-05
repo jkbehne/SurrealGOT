@@ -42,6 +42,9 @@ def heic2png(heic_path: Path, save_path: Path) -> None:
     heic_name = heic_path.name
     if not heic_name.lower().endswith(".heic"):
         raise ValueError(f"Expected heic file. Got a file named {heic_name}")
+    save_name = save_path
+    if not save_path.name.lower().endswith(".png"):
+        save_name = save_path.with_suffix(".png")
     if HAVE_PYHEIF:
         heif_file = pyheif.read(heic_path.expanduser())
         image = Image.frombytes(
@@ -51,9 +54,6 @@ def heic2png(heic_path: Path, save_path: Path) -> None:
     else:
         image_np = imread(heic_path.expanduser())
         image = Image.fromarray(image_np)
-        save_name = save_path
-        if not save_path.name.lower().endswith(".png"):
-            save_name = save_path.with_suffix(".png")
         image.save(save_name)
 
 def dng2png(dng_path: Path, save_path: Path) -> None:
