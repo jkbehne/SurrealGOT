@@ -1,7 +1,7 @@
 """
-The intent of this file is to house functions needed to create a dataset for training
-on subimages of larger, high-resolution images. The main goal is to random sample cropped
-versions of the larger images and ultimate write those to a PyTorch tensor (.pt) file.
+This file houses functions related to creating datasets consisting of small
+cropped windows of large images. The ultimate goal is to make a large
+collection of smaller images to train convolutional neural networks on.
 """
 from pathlib import Path
 from typing import List
