@@ -10,6 +10,14 @@ import torchvision.transforms as tforms
 
 from torch_tools import DTYPE
 
+# Determine if we should use the pyheif library instead
+HAVE_PYHEIF = False
+try:
+    import pyheif
+    HAVE_PYHEIF = True
+except ImportError:
+    HAVE_PYHEIF = False
+
 def heic2png(heic_path: Path, save_path: Path) -> None:
     """
     Convert HEIC image to PNG.
@@ -34,12 +42,19 @@ def heic2png(heic_path: Path, save_path: Path) -> None:
     heic_name = heic_path.name
     if not heic_name.lower().endswith(".heic"):
         raise ValueError(f"Expected heic file. Got a file named {heic_name}")
-    image_np = imread(heic_path.expanduser())
-    image = Image.fromarray(image_np)
-    save_name = save_path
-    if not save_path.name.lower().endswith(".png"):
-        save_name = save_path.with_suffix(".png")
-    image.save(save_name)
+    if HAVE_PYHEIF:
+        heif_file = pyheif.read(heic_path.expanduser())
+        image = Image.frombytes(
+            heif_file.mode, heif_file.size, heif_file.data, "raw",
+        )
+        image.save(save_name)
+    else:
+        image_np = imread(heic_path.expanduser())
+        image = Image.fromarray(image_np)
+        save_name = save_path
+        if not save_path.name.lower().endswith(".png"):
+            save_name = save_path.with_suffix(".png")
+        image.save(save_name)
 
 def dng2png(dng_path: Path, save_path: Path) -> None:
     """
