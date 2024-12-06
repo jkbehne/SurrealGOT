@@ -1,5 +1,6 @@
 from pathlib import Path
 from PIL import Image
+from random import shuffle
 
 from imageio import imwrite
 from imageio.v3 import imread
@@ -17,6 +18,8 @@ try:
     HAVE_PYHEIF = True
 except ImportError:
     HAVE_PYHEIF = False
+
+FILE_BATCH_SIZE = 4
 
 def heic2png(heic_path: Path, save_path: Path) -> None:
     """
@@ -164,35 +167,10 @@ def convertAllToPNG(base_dir: Path, base_str: str, base_out_dir: Path) -> None:
             base_out_dir=base_out_dir,
         )
 
-def saveCropsFromImage(
+def getCropsFromImage(
     image: np.ndarray,
     crop_dim: int,
-    counter: int,
-    base_dir: Path,
-) -> int:
-    """
-    Save crops from an image as separate files.
-
-    Args:
-        image (np.ndarray): Input image.
-        crop_dim (int): Dimension of each crop.
-        counter (int): Initial counter for output file names.
-        base_dir (Path): Base output directory.
-
-    Returns:
-        int: Updated counter.
-
-    Raises:
-        ValueError: If the input image does not have 3 dimensions or 3 color
-            channels.
-
-    Notes:
-        This function saves non-overlapping crops of size crop_dim x crop_dim
-            from the input image.
-        Each crop is saved as a separate PyTorch tensor file in base_dir.
-        The output file names are constructed by appending the counter value
-            and ".pt" to "sample_".
-    """
+) -> list[torch.Tensor]:
     if len(image.shape) != 3:
         raise ValueError(
             "Expected image to have 3 dimensions, but got array of shape "
@@ -203,6 +181,7 @@ def saveCropsFromImage(
         raise ValueError(f"Expected 3 channels not {num_channels}")
     num_crop_rows = num_rows // crop_dim
     num_crop_cols = num_cols // crop_dim
+    out_list: list[torch.Tensor] = []
     for row_idx in range(num_crop_rows):
         for col_idx in range(num_crop_cols):
             ridx_start = row_idx * crop_dim
@@ -210,27 +189,16 @@ def saveCropsFromImage(
             ridx_end = (row_idx + 1) * crop_dim
             cidx_end = (col_idx + 1) * crop_dim
             crop = image[ridx_start:ridx_end, cidx_start:cidx_end, :]
-            crop_t = tforms.ToTensor()(crop).to(DTYPE)
-            fname = base_dir / f"sample_{counter}.pt"
-            torch.save(crop_t, fname)
-            counter += 1
-    return counter
+            crop_t = tforms.ToTensor()(crop).to(DTYPE).unsqueeze(0)
+            out_list.append(crop_t)
+    return out_list
 
-def saveAllCrops(base_dir: Path, crop_dim: int, out_dir: Path) -> None:
-    """
-    Save crops from all PNG images in a directory.
-
-    Args:
-        base_dir (Path): Directory containing PNG images.
-        crop_dim (int): Dimension of each crop.
-        out_dir (Path): Output directory for crop files.
-
-    Notes:
-        This function expects a flat directory structure with only PNG files.
-        It skips nested folders and non-PNG files, printing a warning message.
-        Each PNG image is processed by saveCropsFromImage to extract and save
-            crops.
-    """
+def saveAllCrops(
+    base_dir: Path,
+    crop_dim: int,
+    out_dir: Path,
+    batch_size: int,
+) -> None:
     if not base_dir.exists():
         raise ValueError(f"Directory {base_dir} doesn't exist")
     paths: list[Path] = []
@@ -245,12 +213,28 @@ def saveAllCrops(base_dir: Path, crop_dim: int, out_dir: Path) -> None:
                 f"Expected to process only png files. Found name {path.name}"
             )
         else: paths.append(path)
-    counter = 0
+    shuffle(paths)
+    image_counter = 0
+    batch_counter = 0
+    t_list: list[torch.Tensor] = []
     for path in paths:
         image_np = png2numpy(png_path=path)
-        counter = saveCropsFromImage(
-            image=image_np,
-            crop_dim=crop_dim,
-            counter=counter,
-            base_dir=out_dir,
-        )
+        t_list.extend(getCropsFromImage(image=image_np, crop_dim=crop_dim))
+        image_counter += 1
+        if (image_counter < FILE_BATCH_SIZE): continue
+        else:
+            # Batch up the files and reset counter and tensor list
+            shuffle(t_list)
+            if len(t_list) % batch_size == 0:
+                num_batches = len(t_list) // batch_size
+            else:
+                num_batches = (len(t_list) // batch_size) + 1
+            for batch_idx in range(num_batches):
+                start_idx = batch_idx * batch_size
+                end_idx = min((batch_idx + 1) * batch_size, len(t_list))
+                batch_list = t_list[start_idx:end_idx]
+                batch_t = torch.cat(batch_list)
+                torch.save(batch_t, out_dir / f"batch{batch_counter}.pt")
+                batch_counter += 1
+            image_counter = 0
+            t_list = []

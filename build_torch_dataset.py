@@ -2,7 +2,12 @@ from pathlib import Path
 
 from dataset_tools import saveAllCrops
 
-def main(base_dir: str, out_dir: str, crop_dim: int = 128) -> None:
+def main(
+    base_dir: str,
+    out_dir: str,
+    crop_dim: int = 128,
+    batch_size: int = 256,
+) -> None:
     """Take a flat folder of png files and save PyTorch crop files
 
     Take as many crop_dim x crop_dim sized crops of each image in a flat folder
@@ -22,7 +27,12 @@ def main(base_dir: str, out_dir: str, crop_dim: int = 128) -> None:
     out_path = Path(out_dir).expanduser()
     if not out_path.exists():
         out_path.mkdir(parents=True, exist_ok=True)
-    saveAllCrops(base_dir=base_path, crop_dim=crop_dim, out_dir=out_path)
+    saveAllCrops(
+        base_dir=base_path,
+        crop_dim=crop_dim,
+        out_dir=out_path,
+        batch_size=batch_size,
+    )
 
 if __name__ == "__main__":
     import fire
