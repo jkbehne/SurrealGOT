@@ -17,15 +17,19 @@ from ssim import compute_ssim
 from torch_tools import DEVICE, DTYPE
 from training_tools import AutoEncoderDataset
 
-def _pngDirToTensor(directory: Path) -> tuple[list[torch.Tensor], list[Path]]:
+def _pngDirToTensor(
+    directory: Path,
+    output_dir: Path,
+) -> tuple[list[torch.Tensor], list[Path]]:
     """
     Load all PNG images in the given directory into a list of tensors.
 
     Args:
         directory (Path): The directory to load PNG images from.
+        output_dir (Path): Directory to write the output PNGs to.
 
     Returns:
-        tuple[torch.Tensor, list[Path]]: Output tensor & list of output paths.
+        tuple[torch.Tensor, list[Path]]: Tensor list & output path list.
     """
     image_tensors: list[torch.Tensor] = []
     png_paths: list[Path] = []
@@ -39,7 +43,7 @@ def _pngDirToTensor(directory: Path) -> tuple[list[torch.Tensor], list[Path]]:
                 image_tensor = image_tensor[:3, :, :]
             image_tensors.append(image_tensor.to(device=DEVICE, dtype=DTYPE))
 
-            ofile = file.parent / (file.stem + "_out.png")
+            ofile = output_dir / (file.stem + "_out.png")
             png_paths.append(ofile)
     return image_tensors, png_paths
 
@@ -80,6 +84,7 @@ class DCAETrainer:
         if test_image_dir is not None:
             self.test_images, self.test_out_paths = _pngDirToTensor(
                 directory=test_image_dir,
+                output_dir=self.output_path,
             )
             print(f"Using {len(self.test_images)} test images")
             print(f"Save to paths {self.test_out_paths}")
@@ -148,7 +153,7 @@ def main(
         num_epochs=num_epochs,
         save_rate_batches=save_rate_batches,
         num_filters=num_filters,
-        test_image_dir=test_dir,
+        test_image_dir=test_dir.expanduser(),
     )
     trainer.run()
 
