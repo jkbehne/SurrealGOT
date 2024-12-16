@@ -35,6 +35,10 @@ def _pngDirToTensor(directory: Path) -> tuple[list[torch.Tensor], list[Path]]:
 
             transform = transforms.Compose([transforms.ToTensor()])
             image_tensor: torch.Tensor = transform(image)
+            if image_tensor.shape[0] != 3:
+                print(f"Expected 3 channels. Got shape {image_tensor.shape}")
+                print(f"Image with path {file} won't be tested")
+                continue
             image_tensors.append(image_tensor.to(device=DEVICE, dtype=DTYPE))
 
             ofile = file.parent / (file.stem + "_out.png")
@@ -89,10 +93,8 @@ class DCAETrainer:
             if epoch != 0: self.dataset.reshuffle()
             batch_counter = 0
             for (input, target) in self.dataset:
-                print(input.shape)
                 # Do the forward pass
                 output = self.model(input.to(device=DEVICE, dtype=DTYPE))
-                print(output.shape)
                 loss: torch.Tensor = compute_ssim(
                     image1_t=target.to(device=DEVICE, dtype=DTYPE),
                     image2_t=output,
