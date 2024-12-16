@@ -82,7 +82,7 @@ class DCAETrainer:
         else: self.test_images: Optional[list[torch.Tensor]] = None
 
     def run(self) -> None:
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learn_rate)
+        optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learn_rate)
 
         for epoch in range(self.num_epochs):
             print(f"Running training epoch {epoch}")
