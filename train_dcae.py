@@ -100,7 +100,7 @@ class DCAETrainer:
             for (input, target) in self.dataset:
                 # Do the forward pass
                 output = self.model(input.to(device=DEVICE, dtype=DTYPE))
-                loss: torch.Tensor = compute_ssim(
+                loss: torch.Tensor = -1.0 * compute_ssim(
                     image1_t=target.to(device=DEVICE, dtype=DTYPE),
                     image2_t=output,
                 )
