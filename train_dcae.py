@@ -149,3 +149,7 @@ def main(
         test_image_dir=test_dir,
     )
     trainer.run()
+
+if __name__ == "__main__":
+    import fire
+    fire.Fire(main)
