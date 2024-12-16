@@ -100,7 +100,7 @@ class DCAETrainer:
             for idx in range(len(self.dataset)):
                 optimizer.zero_grad()
                 input, target = self.dataset[idx]
-                print(f"Target / input equal ? {torch.eq(input, target)}")
+                print(f"Target / input equal ? {torch.equal(input, target)}")
                 print(f"Running batch {batch_counter} of {self.save_rate}")
                 print(f"Input shape: {input.shape}")
                 print(f"Target shape: {target.shape}")
