@@ -37,7 +37,7 @@ def _pngDirToTensor(directory: Path) -> tuple[torch.Tensor, list[Path]]:
             image_tensor = transform(image)
             image_tensors.append(image_tensor)
 
-            ofile = file.parent + file.stem + "_out.png"
+            ofile = file.parent / (file.stem + "_out.png")
             png_paths.append(ofile)
 
     # Stack the image tensors into a single 4D tensor
