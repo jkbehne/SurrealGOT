@@ -36,9 +36,7 @@ def _pngDirToTensor(directory: Path) -> tuple[list[torch.Tensor], list[Path]]:
             transform = transforms.Compose([transforms.ToTensor()])
             image_tensor: torch.Tensor = transform(image)
             if image_tensor.shape[0] != 3:
-                print(f"Expected 3 channels. Got shape {image_tensor.shape}")
-                print(f"Image with path {file} won't be tested")
-                continue
+                image_tensor = image_tensor[:3, :, :]
             image_tensors.append(image_tensor.to(device=DEVICE, dtype=DTYPE))
 
             ofile = file.parent / (file.stem + "_out.png")
