@@ -138,7 +138,7 @@ def main(
     batch_size: int = 32,
     learn_rate: float = 0.003,
     num_epochs: int = 80,
-    save_rate_batches: int = 1024,
+    save_rate_batches: int = 256,
     num_filters: int = 64,
     test_image_dir: Optional[str] = None,
 ) -> None:
