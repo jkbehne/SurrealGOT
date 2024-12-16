@@ -100,10 +100,12 @@ class DCAETrainer:
             for (input, target) in self.dataset:
                 # Do the forward pass
                 output = self.model(input.to(device=DEVICE, dtype=DTYPE))
-                loss: torch.Tensor = -1.0 * compute_ssim(
+                loss: torch.Tensor = compute_ssim(
                     image1_t=target.to(device=DEVICE, dtype=DTYPE),
                     image2_t=output,
                 )
+                print(f"Batch loss shape was {loss.shape}")
+                print(f"Batch loss was {loss.item()}")
 
                 # Do the optimizer step
                 optimizer.zero_grad()
@@ -136,7 +138,7 @@ def main(
     dataset_dir: str,
     output_dir: str,
     batch_size: int = 32,
-    learn_rate: float = 0.003,
+    learn_rate: float = 0.001,
     num_epochs: int = 80,
     save_rate_batches: int = 256,
     num_filters: int = 64,
