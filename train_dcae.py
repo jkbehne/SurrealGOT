@@ -138,7 +138,7 @@ def main(
     batch_size: int = 32,
     learn_rate: float = 0.003,
     num_epochs: int = 80,
-    save_rate_batches: int = 128,
+    save_rate_batches: int = 1024,
     num_filters: int = 64,
     test_image_dir: Optional[str] = None,
 ) -> None:
@@ -160,3 +160,5 @@ def main(
 if __name__ == "__main__":
     import fire
     fire.Fire(main)
+
+# python train_dcae.py --dataset_dir=/content/drive/MyDrive/TorchDataset --output_dir=/content/drive/MyDrive/code/dcae_logs --test_image_dir=/content/drive/MyDrive/code/SurrealGOT/val_images
