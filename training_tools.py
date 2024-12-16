@@ -88,7 +88,9 @@ class AutoEncoderDataset(Dataset):
         if batch_idx == 0:
             # Open up a new file
             fpath = self.files[file_idx]
+            print(f"Loading file {fpath}")
             self.current_file_data = torch.load(fpath)
+            print("Finished loading file")
 
             # Check if we have a full file first
             num_samples = self.current_file_data.shape[0]
