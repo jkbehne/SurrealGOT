@@ -98,24 +98,28 @@ class DCAETrainer:
             if epoch != 0: self.dataset.reshuffle()
             batch_counter = 0
             for (input, target) in self.dataset:
+                print(f"Running batch {batch_counter} of {self.save_rate}")
+                print(f"Input shape: {input.shape}")
+                print(f"Target shape: {target.shape}")
                 # Do the forward pass
                 output = self.model(input.to(device=DEVICE, dtype=DTYPE))
                 loss: torch.Tensor = compute_ssim(
                     image1_t=target.to(device=DEVICE, dtype=DTYPE),
                     image2_t=output,
                 )
-                print(f"Batch loss shape was {loss.shape}")
                 print(f"Batch loss was {loss.item()}")
 
                 # Do the optimizer step
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
+                print("Finished optimizer step")
 
                 if batch_counter >= self.save_rate:
                     print(f"Current loss = {loss.item()}")
                     self.save()
-                batch_counter += 1
+                    batch_counter = 0
+                else: batch_counter += 1
 
     def save(self) -> None:
         # Save states in case we need to reload
