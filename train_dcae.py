@@ -92,6 +92,7 @@ class DCAETrainer:
                 print(input.shape)
                 # Do the forward pass
                 output = self.model(input.to(device=DEVICE, dtype=DTYPE))
+                print(output.shape)
                 loss: torch.Tensor = compute_ssim(
                     image1_t=target.to(device=DEVICE, dtype=DTYPE),
                     image2_t=output,
