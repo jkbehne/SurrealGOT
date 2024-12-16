@@ -14,9 +14,7 @@ class DCAE(nn.Module):
                     3,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=7,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
                 nn.ReLU(),
             ),
@@ -25,10 +23,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=7,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 3
@@ -36,10 +33,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=7,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 4
@@ -47,10 +43,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=5,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 5
@@ -58,10 +53,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=5,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 6
@@ -69,10 +63,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=5,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 7
@@ -80,10 +73,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=5,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 8
@@ -91,10 +83,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 9
@@ -102,10 +93,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 10
@@ -113,10 +103,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 11
@@ -124,10 +113,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 12
@@ -135,10 +123,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 13
@@ -146,10 +133,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 14
@@ -157,10 +143,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 15
@@ -168,10 +153,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 16
@@ -179,10 +163,9 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     num_filters,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
+                nn.BatchNorm2d(num_filters),
                 nn.ReLU(),
             ),
             nn.Sequential(  # Layer 17
@@ -190,9 +173,7 @@ class DCAE(nn.Module):
                     num_filters,  # Input channels
                     3,  # Output channels
                     kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    padding_mode="zeros",
+                    padding="same",
                 ),
                 nn.ReLU(),
             ),
