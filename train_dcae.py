@@ -17,9 +17,9 @@ from ssim import compute_ssim
 from torch_tools import DEVICE, DTYPE
 from training_tools import AutoEncoderDataset
 
-def _pngDirToTensor(directory: Path) -> tuple[torch.Tensor, list[Path]]:
+def _pngDirToTensor(directory: Path) -> tuple[list[torch.Tensor], list[Path]]:
     """
-    Load all PNG images in the given directory into a single 4D PyTorch tensor.
+    Load all PNG images in the given directory into a list of tensors.
 
     Args:
         directory (Path): The directory to load PNG images from.
@@ -34,15 +34,12 @@ def _pngDirToTensor(directory: Path) -> tuple[torch.Tensor, list[Path]]:
             image = Image.open(file)
 
             transform = transforms.Compose([transforms.ToTensor()])
-            image_tensor = transform(image)
-            image_tensors.append(image_tensor)
+            image_tensor: torch.Tensor = transform(image)
+            image_tensors.append(image_tensor.to(device=DEVICE, dtype=DTYPE))
 
             ofile = file.parent / (file.stem + "_out.png")
             png_paths.append(ofile)
-
-    # Stack the image tensors into a single 4D tensor
-    tensor = torch.stack(image_tensors)
-    return tensor.to(device=DEVICE, dtype=DTYPE), png_paths
+    return image_tensors, png_paths
 
 class DCAETrainer:
     def __init__(
@@ -79,10 +76,10 @@ class DCAETrainer:
 
         # Pre-load the test images if a path was given
         if test_image_dir is not None:
-            self.test_image_t, self.test_out_paths = _pngDirToTensor(
+            self.test_images, self.test_out_paths = _pngDirToTensor(
                 directory=test_image_dir,
             )
-        else: self.test_image_t: Optional[torch.Tensor] = None
+        else: self.test_images: Optional[list[torch.Tensor]] = None
 
     def run(self) -> None:
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learn_rate)
@@ -118,12 +115,12 @@ class DCAETrainer:
         visualizeConv2dModel(model=self.model, save_dir=self.output_path)
 
         # Run the model on test images if we have them
-        if self.test_image_t is not None:
+        if self.test_images is not None:
             with torch.no_grad():
-                test_out_t: torch.Tensor = self.model(self.test_image_t)
-                test_out_t = test_out_t.cpu().detach()
-                for idx, opath in enumerate(self.test_out_paths):
-                    save_image(test_out_t[idx, :, :, :].squeeze(0), opath)
+                for image_t, opath in zip(self.test_images, self.test_out_paths):
+                    out_t: torch.Tensor = self.model(image_t.unsqueeze(0))
+                    out_t = out_t.squeeze(0).cpu().detach()
+                    save_image(out_t, opath)
 
 def main(
     dataset_dir: str,
