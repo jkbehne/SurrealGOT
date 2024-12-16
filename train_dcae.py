@@ -98,6 +98,7 @@ class DCAETrainer:
             if epoch != 0: self.dataset.reshuffle()
             batch_counter = 0
             for (input, target) in self.dataset:
+                optimizer.zero_grad()
                 print(f"Running batch {batch_counter} of {self.save_rate}")
                 print(f"Input shape: {input.shape}")
                 print(f"Target shape: {target.shape}")
@@ -110,7 +111,6 @@ class DCAETrainer:
                 print(f"Batch loss was {loss.item()}")
 
                 # Do the optimizer step
-                optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
                 print("Finished optimizer step")
