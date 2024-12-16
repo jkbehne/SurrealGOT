@@ -81,6 +81,8 @@ class DCAETrainer:
             self.test_images, self.test_out_paths = _pngDirToTensor(
                 directory=test_image_dir,
             )
+            print(f"Using {len(self.test_images)} test images")
+            print(f"Save to paths {self.test_out_paths}")
         else: self.test_images: Optional[list[torch.Tensor]] = None
 
     def run(self) -> None:
@@ -119,6 +121,7 @@ class DCAETrainer:
         # Run the model on test images if we have them
         if self.test_images is not None:
             with torch.no_grad():
+                print("Saving test images")
                 for image_t, opath in zip(self.test_images, self.test_out_paths):
                     out_t: torch.Tensor = self.model(image_t.unsqueeze(0))
                     out_t = out_t.squeeze(0).cpu().detach()
