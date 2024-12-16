@@ -89,6 +89,7 @@ class DCAETrainer:
             if epoch != 0: self.dataset.reshuffle()
             batch_counter = 0
             for (input, target) in self.dataset:
+                print(input.shape)
                 # Do the forward pass
                 output = self.model(input.to(device=DEVICE, dtype=DTYPE))
                 loss: torch.Tensor = compute_ssim(
