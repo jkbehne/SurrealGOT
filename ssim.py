@@ -106,4 +106,4 @@ def compute_ssim(
     num = (2.0 * mu_cross + C1) * (2.0 * cov + C2)
     den = (mu1_sq + mu2_sq + C1) * (var1 + var2 + C2)
 
-    return torch.mean(num / den).item()
+    return torch.mean(num / den)
