@@ -131,7 +131,7 @@ def main(
     dataset_dir: str,
     output_dir: str,
     batch_size: int = 32,
-    learn_rate: float = 0.001,
+    learn_rate: float = 0.003,
     num_epochs: int = 80,
     save_rate_batches: int = 128,
     num_filters: int = 64,
