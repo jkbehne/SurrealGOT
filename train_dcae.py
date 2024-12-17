@@ -99,11 +99,12 @@ class DCAETrainer:
             batch_counter = 0
             for idx in range(len(self.dataset)):
                 optimizer.zero_grad()
-                input, target = self.dataset[idx]
-                print(f"Target / input equal ? {torch.equal(input, target)}")
+                ds_res = self.dataset[idx]
+                if ds_res is None:
+                    print(f"Dataset entry at index {idx} didn't load")
+                    continue
+                input, target = ds_res
                 print(f"Running batch {batch_counter} of {self.save_rate}")
-                print(f"Input shape: {input.shape}")
-                print(f"Target shape: {target.shape}")
                 # Do the forward pass
                 output = self.model(input.to(device=DEVICE, dtype=DTYPE))
                 loss: torch.Tensor = compute_ssim(
@@ -115,7 +116,6 @@ class DCAETrainer:
                 # Do the optimizer step
                 loss.backward()
                 optimizer.step()
-                print("Finished optimizer step")
 
                 if batch_counter >= self.save_rate:
                     print(f"Current loss = {loss.item()}")

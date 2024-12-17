@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 from random import shuffle
+import signal
 from typing import Optional, Tuple
 
 import numpy as np
@@ -11,6 +12,22 @@ from torch.utils.data import Dataset, DataLoader
 
 # Number of samples per file is assumed to be 256, but that could change
 SAMPLES_PER_FILE = 256
+
+def handler(signum, frame):
+    raise TimeoutError("Operation timed out")
+
+signal.signal(signal.SIGALRM, handler)
+
+def wrapTimeout(func, timeout: float, *args, **kwargs):
+    signal.alarm(timeout)
+    try:
+        result = func(*args, **kwargs)
+        signal.alarm(0)
+        return result
+    except TimeoutError as e:
+        print(f"Operation timed out!")
+        signal.alarm(0)
+        return None
 
 def findPyTorchFiles(base_dir: Path) -> list[Path]:
     """
@@ -88,9 +105,10 @@ class AutoEncoderDataset(Dataset):
         if batch_idx == 0:
             # Open up a new file
             fpath = self.files[file_idx]
-            print(f"Loading file {fpath}")
-            self.current_file_data = torch.load(fpath)
-            print("Finished loading file")
+            self.current_file_data = wrapTimeout(torch.load, 5.0, fpath)
+            if self.current_file_data is None:
+                print(f"File {fpath} didn't load in time")
+                return None
 
             # Check if we have a full file first
             num_samples = self.current_file_data.shape[0]
@@ -103,6 +121,7 @@ class AutoEncoderDataset(Dataset):
                 ).tolist()
                 self.current_file_data = self.current_file_data[new_idxs, :, :, :]
 
+        if self.current_file_data is None: return None
         start_idx = batch_idx * self.batch_size
         end_idx = (batch_idx + 1) * self.batch_size
         batch = self.current_file_data[start_idx:end_idx, :, :, :]
