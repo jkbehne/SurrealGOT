@@ -18,7 +18,7 @@ def handler(signum, frame):
 
 signal.signal(signal.SIGALRM, handler)
 
-def wrapTimeout(func, timeout: float, *args, **kwargs):
+def wrapTimeout(func, timeout: int, *args, **kwargs):
     signal.alarm(timeout)
     try:
         result = func(*args, **kwargs)
@@ -105,7 +105,7 @@ class AutoEncoderDataset(Dataset):
         if batch_idx == 0:
             # Open up a new file
             fpath = self.files[file_idx]
-            self.current_file_data = wrapTimeout(torch.load, 5.0, fpath)
+            self.current_file_data = wrapTimeout(torch.load, 5, fpath)
             if self.current_file_data is None:
                 print(f"File {fpath} didn't load in time")
                 return None
