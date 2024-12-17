@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from random import shuffle
 import signal
+import threading
 from typing import Optional, Tuple
 
 import numpy as np
@@ -28,6 +29,43 @@ def wrapTimeout(func, timeout: int, *args, **kwargs):
         print(f"Operation timed out!")
         signal.alarm(0)
         return None
+
+def loadTensorWithTimeout(file_path: Path, timeout: int = 5) -> torch.Tensor:
+    """
+    Attempt to load a PyTorch tensor from the given file path with a timeout.
+
+    Args:
+        file_path (Path): The path to the file containing the PyTorch tensor.
+        timeout (int, optional): The timeout in seconds. Defaults to 5.
+
+    Returns:
+        torch.Tensor: The loaded PyTorch tensor, or None if the loading process timed out.
+    """
+
+    # Create a list to store the result
+    result = [None]
+
+    # Define a function to load the tensor
+    def load_tensor():
+        try:
+            result[0] = torch.load(file_path)
+        except Exception as e:
+            print(f"Error loading tensor: {e}")
+
+    # Create a timer to interrupt the loading process if it takes too long
+    timer = threading.Timer(timeout, lambda: None)
+    timer.start()
+
+    # Load the tensor in a separate thread
+    thread = threading.Thread(target=load_tensor)
+    thread.start()
+    thread.join()
+
+    # Cancel the timer
+    timer.cancel()
+
+    # Return the result
+    return result[0]
 
 def findPyTorchFiles(base_dir: Path) -> list[Path]:
     """
@@ -105,7 +143,8 @@ class AutoEncoderDataset(Dataset):
         if batch_idx == 0:
             # Open up a new file
             fpath = self.files[file_idx]
-            self.current_file_data = wrapTimeout(torch.load, 5, fpath)
+            self.current_file_data = loadTensorWithTimeout(file_path=fpath)
+            # self.current_file_data = wrapTimeout(torch.load, 5, fpath)
             if self.current_file_data is None:
                 print(f"File {fpath} didn't load in time")
                 return None
